@@ -1,4 +1,4 @@
-package br.com.sea.tecnologia.desafio.controller.response;
+package br.com.sea.tecnologia.desafio.dto.response;
 
 import lombok.Data;
 

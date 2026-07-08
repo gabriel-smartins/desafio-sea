@@ -1,11 +1,10 @@
-package br.com.sea.tecnologia.desafio.controller.response;
+package br.com.sea.tecnologia.desafio.dto.response;
 
-import br.com.sea.tecnologia.desafio.model.Endereco;
 import br.com.sea.tecnologia.desafio.model.enums.TipoTelefone;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -14,9 +13,9 @@ public class ClienteResponseDTO {
     private UUID id;
     private String nome;
     private String cpf;
-    private Endereco endereco;
-    private List<TelefoneResponseDTO> telefones;
-    private List<String> emails;
+    private EnderecoResponseDTO endereco;
+    private Set<TelefoneResponseDTO> telefones;
+    private Set<String> emails;
 
     @Data
     @Builder
