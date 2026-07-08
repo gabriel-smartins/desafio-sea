@@ -29,6 +29,19 @@ public class Telefone {
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Telefone)) return false;
+        Telefone telefone = (Telefone) o;
+        return id != null && id.equals(telefone.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
     @PrePersist
     public void generateId() {
         if (this.id == null) {

@@ -18,11 +18,24 @@ public class Email {
     private UUID id;
 
     @Column(nullable = false, length = 150)
-    private String endereco;
+    private String email;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Email)) return false;
+        Email emailObj = (Email) o;
+        return id != null && id.equals(emailObj.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 
     @PrePersist
     public void generateId() {

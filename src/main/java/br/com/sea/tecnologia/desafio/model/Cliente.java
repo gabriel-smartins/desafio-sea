@@ -6,9 +6,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "clientes")
@@ -33,11 +31,11 @@ public class Cliente {
 
     @Builder.Default
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Telefone> telefones = new ArrayList<>();
+    private Set<Telefone> telefones = new HashSet<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Email> emails = new ArrayList<>();
+    private Set<Email> emails = new HashSet<>();
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -71,5 +69,11 @@ public class Cliente {
     public void removeEmail(Email email) {
         emails.remove(email);
         email.setCliente(null);
+    }
+
+    public void atualizarDadosBasicos(Cliente novosDados) {
+        this.nome = novosDados.getNome();
+        this.cpf = novosDados.getCpf();
+        this.endereco = novosDados.getEndereco();
     }
 }
