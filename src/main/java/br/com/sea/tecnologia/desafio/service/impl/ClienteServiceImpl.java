@@ -48,6 +48,7 @@ public class ClienteServiceImpl implements ClienteService {
 
         garantirVinculoBidirecional(cliente);
         preencherEnderecoViaCep(cliente);
+        validarEnderecoCompleto(cliente.getEndereco());
 
         return clienteRepository.save(cliente);
     }
@@ -106,10 +107,36 @@ public class ClienteServiceImpl implements ClienteService {
         ViaCepResponseDTO dados = viaCepService.buscarPorCep(cliente.getEndereco().getCep());
         Endereco endereco = cliente.getEndereco();
 
-        if (dados.getLogradouro() != null) endereco.setLogradouro(dados.getLogradouro());
-        if (dados.getBairro() != null) endereco.setBairro(dados.getBairro());
-        if (dados.getLocalidade() != null) endereco.setCidade(dados.getLocalidade());
-        if (dados.getUf() != null) endereco.setUf(dados.getUf());
+        if (camposEnderecoVazios(endereco.getLogradouro()) && dados.getLogradouro() != null) {
+            endereco.setLogradouro(dados.getLogradouro());
+        }
+        if (camposEnderecoVazios(endereco.getBairro()) && dados.getBairro() != null) {
+            endereco.setBairro(dados.getBairro());
+        }
+        if (camposEnderecoVazios(endereco.getCidade()) && dados.getLocalidade() != null) {
+            endereco.setCidade(dados.getLocalidade());
+        }
+        if (camposEnderecoVazios(endereco.getUf()) && dados.getUf() != null) {
+            endereco.setUf(dados.getUf());
+        }
+    }
+
+    private boolean camposEnderecoVazios(String valor) {
+        return valor == null || valor.trim().isEmpty();
+    }
+
+    private void validarEnderecoCompleto(Endereco endereco) {
+        if (endereco == null) {
+            throw new BusinessException("O endereço é obrigatório.");
+        }
+
+        if (camposEnderecoVazios(endereco.getCep())
+                || camposEnderecoVazios(endereco.getLogradouro())
+                || camposEnderecoVazios(endereco.getBairro())
+                || camposEnderecoVazios(endereco.getCidade())
+                || camposEnderecoVazios(endereco.getUf())) {
+            throw new BusinessException("Preencha todos os campos do endereço.");
+        }
     }
 
     private void atualizarTelefones(Cliente existente, Set<Telefone> novosTelefones) {

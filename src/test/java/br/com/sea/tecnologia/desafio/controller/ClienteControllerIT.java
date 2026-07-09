@@ -71,6 +71,62 @@ public class ClienteControllerIT {
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void devePreservarDadosInformadosNoEnderecoQuandoViaCepForConsultado() throws Exception {
+
+        ViaCepResponseDTO viaCepMock = new ViaCepResponseDTO();
+        viaCepMock.setLogradouro("Praça da Sé");
+        viaCepMock.setBairro("Sé");
+        viaCepMock.setLocalidade("São Paulo");
+        viaCepMock.setUf("SP");
+
+        when(restTemplate.getForEntity(anyString(), any(), anyString())).thenReturn(ResponseEntity.ok(viaCepMock));
+
+        String jsonRequest = "{\n" +
+                "  \"nome\": \"Gabriel Martins\",\n" +
+                "  \"cpf\": \"529.982.247-25\",\n" +
+                "  \"endereco\": { \"cep\": \"01001-000\", \"logradouro\": \"Rua Personalizada\", \"bairro\": \"Bairro Personalizado\", \"cidade\": \"Cidade Personalizada\", \"uf\": \"DF\" },\n" +
+                "  \"telefones\": [ { \"tipo\": \"CELULAR\", \"numero\": \"(11) 98765-4321\" } ],\n" +
+                "  \"emails\": [ { \"email\": \"gabriel@email.com\" } ]\n" +
+                "}";
+
+        mockMvc.perform(post("/clientes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.endereco.logradouro").value("Rua Personalizada"))
+                .andExpect(jsonPath("$.endereco.bairro").value("Bairro Personalizado"))
+                .andExpect(jsonPath("$.endereco.cidade").value("Cidade Personalizada"))
+                .andExpect(jsonPath("$.endereco.uf").value("DF"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void deveRetornarBadRequestQuandoEnderecoObrigatorioEstiverIncompleto() throws Exception {
+        ViaCepResponseDTO viaCepMock = new ViaCepResponseDTO();
+        viaCepMock.setLogradouro(null);
+        viaCepMock.setBairro(null);
+        viaCepMock.setLocalidade(null);
+        viaCepMock.setUf(null);
+
+        when(restTemplate.getForEntity(anyString(), any(), anyString())).thenReturn(ResponseEntity.ok(viaCepMock));
+
+        String jsonRequest = "{\n" +
+                "  \"nome\": \"Gabriel Martins\",\n" +
+                "  \"cpf\": \"529.982.247-25\",\n" +
+                "  \"endereco\": { \"cep\": \"01001-000\", \"logradouro\": \"\", \"bairro\": \"\", \"cidade\": \"\", \"uf\": \"\" },\n" +
+                "  \"telefones\": [ { \"tipo\": \"CELULAR\", \"numero\": \"(11) 98765-4321\" } ],\n" +
+                "  \"emails\": [ { \"email\": \"gabriel@email.com\" } ]\n" +
+                "}";
+
+        mockMvc.perform(post("/clientes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Preencha todos os campos do endereço."));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void deveRetornarBadRequestQuandoCpfForInvalido() throws Exception {
         String jsonRequest = "{\n" +
                 "  \"nome\": \"Gabriel Martins\",\n" +
