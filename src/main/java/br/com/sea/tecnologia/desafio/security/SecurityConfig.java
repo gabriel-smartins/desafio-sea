@@ -31,6 +31,8 @@ public class SecurityConfig {
                 .and()
                 .cors()
                 .and()
+                .headers().frameOptions().disable()
+                .and()
                 .authorizeRequests()
                 .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
