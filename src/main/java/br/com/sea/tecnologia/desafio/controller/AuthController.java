@@ -1,5 +1,6 @@
 package br.com.sea.tecnologia.desafio.controller;
 
+import br.com.sea.tecnologia.desafio.controller.docs.AuthApi;
 import br.com.sea.tecnologia.desafio.dto.request.LoginRequestDTO;
 import br.com.sea.tecnologia.desafio.dto.response.AuthResponse;
 import br.com.sea.tecnologia.desafio.security.TokenService;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController {
+public class AuthController implements AuthApi {
 
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
@@ -24,6 +25,7 @@ public class AuthController {
         this.tokenService = tokenService;
     }
 
+    @Override
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequestDTO request) {
 
@@ -36,6 +38,7 @@ public class AuthController {
 
         return ResponseEntity.ok(AuthResponse.builder()
                 .token(token)
+                .role(authentication.getAuthorities().iterator().next().getAuthority())
                 .build());
     }
 }
