@@ -2,6 +2,7 @@ package br.com.sea.tecnologia.desafio.model;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
@@ -18,6 +19,7 @@ import java.util.*;
 public class Cliente {
 
     @Id
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID id;
 
     @Column(nullable = false, length = 100)
@@ -72,8 +74,8 @@ public class Cliente {
     }
 
     public void atualizarDadosBasicos(Cliente novosDados) {
-        this.nome = novosDados.getNome();
-        this.cpf = novosDados.getCpf();
-        this.endereco = novosDados.getEndereco();
+        if(novosDados.getNome() != null) this.nome = novosDados.getNome();
+        if(novosDados.getCpf() != null) this.cpf = novosDados.getCpf();
+        if(novosDados.getEndereco() != null) this.endereco = novosDados.getEndereco();
     }
 }

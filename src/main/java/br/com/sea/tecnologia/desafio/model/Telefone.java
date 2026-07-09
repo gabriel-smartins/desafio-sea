@@ -2,6 +2,7 @@ package br.com.sea.tecnologia.desafio.model;
 
 import br.com.sea.tecnologia.desafio.model.enums.TipoTelefone;
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class Telefone {
 
     @Id
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID id;
 
     @Enumerated(EnumType.STRING)

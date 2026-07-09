@@ -8,7 +8,7 @@ public class CpfUtil {
 
     public static boolean isValido(String cpf) {
         if (cpf == null) {
-            return false;
+            return true;
         }
 
         String digitos = MascaraUtil.remover(cpf);

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ClienteServiceImpl implements ClienteService {
@@ -69,14 +70,17 @@ public class ClienteServiceImpl implements ClienteService {
     public void update(UUID id, Cliente cliente) {
         Cliente clienteExistente = findById(id);
 
-        if (!CpfUtil.isValido(cliente.getCpf())) {
-            throw new BusinessException("CPF inválido: " + cliente.getCpf());
-        }
-
         removerMascaras(cliente);
 
-        if (clienteRepository.existsByCpf(cliente.getCpf())) {
-            throw new BusinessException("Já existe um cliente cadastrado com este CPF.");
+        if (cliente.getCpf() != null && !cliente.getCpf().equals(clienteExistente.getCpf())) {
+
+            if (!CpfUtil.isValido(cliente.getCpf())) {
+                throw new BusinessException("CPF inválido: " + cliente.getCpf());
+            }
+
+            if (clienteRepository.existsByCpf(cliente.getCpf())) {
+                throw new BusinessException("Já existe outro cliente cadastrado com este CPF.");
+            }
         }
 
         clienteExistente.atualizarDadosBasicos(cliente);
@@ -109,17 +113,51 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     private void atualizarTelefones(Cliente existente, Set<Telefone> novosTelefones) {
-        existente.getTelefones().clear();
-        if (novosTelefones != null) {
-            novosTelefones.forEach(existente::addTelefone);
+        if (novosTelefones == null) {
+            return;
         }
+
+        Set<String> numerosNovos = novosTelefones.stream()
+                .map(Telefone::getNumero)
+                .collect(Collectors.toSet());
+
+        List<Telefone> telefonesParaRemover = existente.getTelefones().stream()
+                .filter(telefone -> !numerosNovos.contains(telefone.getNumero()))
+                .collect(Collectors.toList());
+
+        telefonesParaRemover.forEach(existente::removeTelefone);
+
+        Set<String> numerosExistentes = existente.getTelefones().stream()
+                .map(Telefone::getNumero)
+                .collect(Collectors.toSet());
+
+        novosTelefones.stream()
+                .filter(telefone -> !numerosExistentes.contains(telefone.getNumero()))
+                .forEach(existente::addTelefone);
     }
 
     private void atualizarEmails(Cliente existente, Set<Email> novosEmails) {
-        existente.getEmails().clear();
-        if (novosEmails != null) {
-            novosEmails.forEach(existente::addEmail);
+        if (novosEmails == null) {
+            return;
         }
+
+        Set<String> enderecosNovos = novosEmails.stream()
+                .map(Email::getEmail)
+                .collect(Collectors.toSet());
+
+        List<Email> emailsParaRemover = existente.getEmails().stream()
+                .filter(email -> !enderecosNovos.contains(email.getEmail()))
+                .collect(Collectors.toList());
+
+        emailsParaRemover.forEach(existente::removeEmail);
+
+        Set<String> enderecosExistentes = existente.getEmails().stream()
+                .map(Email::getEmail)
+                .collect(Collectors.toSet());
+
+        novosEmails.stream()
+                .filter(email -> !enderecosExistentes.contains(email.getEmail()))
+                .forEach(existente::addEmail);
     }
 
     private void garantirVinculoBidirecional(Cliente cliente) {

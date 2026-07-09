@@ -1,6 +1,7 @@
 package br.com.sea.tecnologia.desafio.mapper;
 
 import br.com.sea.tecnologia.desafio.dto.request.ClienteRequestDTO;
+import br.com.sea.tecnologia.desafio.dto.request.ClienteUpdateRequestDTO;
 import br.com.sea.tecnologia.desafio.dto.request.EnderecoRequestDTO;
 import br.com.sea.tecnologia.desafio.dto.response.ClienteResponseDTO;
 import br.com.sea.tecnologia.desafio.dto.response.EnderecoResponseDTO;
@@ -36,6 +37,37 @@ public class ClienteMapper {
         }
 
         return cliente;
+    }
+
+    public Cliente toEntity(ClienteUpdateRequestDTO dto) {
+        Cliente.ClienteBuilder builder = Cliente.builder()
+                .nome(dto.getNome())
+                .cpf(dto.getCpf())
+                .endereco(dto.getEndereco() != null ? toEndereco(dto.getEndereco()) : null);
+
+        if (dto.getTelefones() == null) {
+            builder.telefones(null);
+        }
+        if (dto.getEmails() == null) {
+            builder.emails(null);
+        }
+
+        Cliente cliente = builder.build();
+
+        if (dto.getTelefones() != null) {
+            dto.getTelefones().forEach(t -> cliente.addTelefone(
+                    Telefone.builder().tipo(t.getTipo()).numero(t.getNumero()).build()
+            ));
+        }
+
+        if (dto.getEmails() != null) {
+            dto.getEmails().forEach(e -> cliente.addEmail(
+                    Email.builder().email(e.getEmail()).build()
+            ));
+        }
+
+        return cliente;
+
     }
 
     private Endereco toEndereco(EnderecoRequestDTO dto) {
