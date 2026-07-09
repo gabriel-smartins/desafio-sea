@@ -159,4 +159,5 @@ Também existe um usuário padrão:
 
 - O projeto usa H2 em memória, então os dados são reiniciados ao reiniciar a aplicação.
 - Os usuários iniciais são criados automaticamente na inicialização da aplicação.
+- O console do H2 está habilitado para facilitar a inspeção do estado do banco em tempo de execução. Acesse http://localhost:8080/h2-console e use os dados de conexão padrão: URL JDBC `jdbc:h2:mem:desafio`, usuário `sa` e senha em branco.
 - O backend não depende de um frontend para funcionar; ele pode ser consumido diretamente via Swagger ou por qualquer cliente HTTP.
