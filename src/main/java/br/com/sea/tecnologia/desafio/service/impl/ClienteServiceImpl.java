@@ -86,6 +86,11 @@ public class ClienteServiceImpl implements ClienteService {
 
         clienteExistente.atualizarDadosBasicos(cliente);
 
+        if (cliente.getEndereco() != null) {
+            preencherEnderecoViaCep(clienteExistente);
+            validarEnderecoCompleto(clienteExistente.getEndereco());
+        }
+
         atualizarTelefones(clienteExistente, cliente.getTelefones());
         atualizarEmails(clienteExistente, cliente.getEmails());
 
